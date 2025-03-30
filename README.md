@@ -33,5 +33,5 @@ curl -x http://127.0.0.1:8080 http://mail.ru
 **HTTPS запрос:**
 
 ```bash
-curl -x http://127.0.0.1:8080 https://mail.ru
+curl -k -x http://127.0.0.1:8080 https://mail.ru
 ```
