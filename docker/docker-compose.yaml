@@ -1,0 +1,9 @@
+services:
+  mitmproxy:
+    container_name: mitmproxy
+    platform: linux/amd64
+    build:
+      dockerfile: docker/Dockerfile
+      context: ..
+    ports:
+      - 8080:8080
