@@ -12,11 +12,11 @@ docker-compose-build:
 
 .PHONY: docker-compose-up
 docker-compose-up:
-	@docker compose -f $(DOCKER_COMPOSE_PATH) up -d
+	@docker compose -f $(DOCKER_COMPOSE_PATH) -p $(PROJECT_NAME) up -d
 
 .PHONY: docker-compose-stop
 docker-compose-stop:
-	@docker compose -f $(DOCKER_COMPOSE_PATH) stop
+	@docker compose -f $(DOCKER_COMPOSE_PATH) -p $(PROJECT_NAME) stop
 
 
 # ==============================================================================

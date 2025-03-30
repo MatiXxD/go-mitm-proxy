@@ -13,7 +13,7 @@ make gen
 После того, как сертификаты сгенерированы можно запустить проект через `docker compose`:
 
 ```bash
-make docker-compose-build && docker-compose-up
+make docker-compose-build && make docker-compose-up
 ```
 
 Чтобы остановить контейнеры:
@@ -27,7 +27,7 @@ make docker-compose-stop
 **HTTP запрос:**
 
 ```bash
-curl -x http://127.0.0.1:8080
+curl -x http://127.0.0.1:8080 http://mail.ru
 ```
 
 **HTTPS запрос:**
