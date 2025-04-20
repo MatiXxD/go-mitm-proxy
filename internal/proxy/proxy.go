@@ -3,6 +3,7 @@ package proxy
 import (
 	"errors"
 	"fmt"
+	"go.uber.org/zap"
 	"log"
 	"net"
 	"sync"
@@ -14,21 +15,23 @@ import (
 type Proxy struct {
 	delivery *proxy.ProxyDelivery
 	cfg      *env.Config
+	logger   *zap.Logger
 }
 
-func NewProxy(pd *proxy.ProxyDelivery, cfg *env.Config) *Proxy {
+func NewProxy(pd *proxy.ProxyDelivery, cfg *env.Config, logger *zap.Logger) *Proxy {
 	return &Proxy{
 		delivery: pd,
 		cfg:      cfg,
+		logger:   logger,
 	}
 }
 
 func (p *Proxy) Start() error {
-	listener, err := net.Listen("tcp4", p.cfg.Addr)
+	listener, err := net.Listen("tcp4", p.cfg.ProxyConfig.Addr)
 	if err != nil {
-		return fmt.Errorf("can't listen on %s: %v", p.cfg.Addr, err)
+		return fmt.Errorf("can't listen on %s: %v", p.cfg.ProxyConfig.Addr, err)
 	}
-	log.Printf("proxy listen on %s", p.cfg.Addr)
+	p.logger.Info(fmt.Sprintf("proxy listen on %s", p.cfg.ProxyConfig.Addr))
 
 	wg := &sync.WaitGroup{}
 	for {

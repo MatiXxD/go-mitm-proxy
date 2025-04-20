@@ -115,7 +115,7 @@ func (pd *ProxyDelivery) generateCert(host string) (map[string][]byte, error) {
 }
 
 func getPrivateCert(cfg *env.Config) (*tls.Certificate, error) {
-	keyPEM, err := os.ReadFile(cfg.KeyPath)
+	keyPEM, err := os.ReadFile(cfg.ProxyConfig.KeyPath)
 	if err != nil {
 		return nil, fmt.Errorf("can't read ca key: %v", err)
 	}
@@ -125,7 +125,7 @@ func getPrivateCert(cfg *env.Config) (*tls.Certificate, error) {
 		return nil, fmt.Errorf("can't parse ca key: %v", err)
 	}
 
-	certPEM, err := os.ReadFile(cfg.CertPath)
+	certPEM, err := os.ReadFile(cfg.ProxyConfig.CertPath)
 	if err != nil {
 		return nil, fmt.Errorf("can't read ca cert: %v", err)
 	}
