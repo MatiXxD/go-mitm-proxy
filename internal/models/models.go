@@ -1,6 +1,7 @@
 package models
 
 import (
+	"go.mongodb.org/mongo-driver/bson/primitive"
 	"io"
 	"net/http"
 	"net/url"
@@ -20,6 +21,11 @@ type ParsedRequest struct {
 }
 
 func NewParsedRequest(r *http.Request) (*ParsedRequest, error) {
+	url := r.URL.String()
+	if r.URL.Hostname() == "" {
+		url = "https://" + r.Host + r.URL.Path
+	}
+
 	body := ""
 	if r.Body != nil {
 		bytes, err := io.ReadAll(r.Body)
@@ -37,7 +43,7 @@ func NewParsedRequest(r *http.Request) (*ParsedRequest, error) {
 
 	return &ParsedRequest{
 		Method:        r.Method,
-		URL:           r.URL.String(),
+		URL:           url,
 		Form:          r.Form,
 		Header:        r.Header,
 		Cookies:       r.Cookies(),
@@ -81,6 +87,13 @@ type RequestInfo struct {
 	Request   *ParsedRequest  `bson:"request"`
 	Response  *ParsedResponse `bson:"response"`
 	CreatedAt time.Time       `bson:"createdAt"`
+}
+
+type RequestInfoWithID struct {
+	ID        primitive.ObjectID `bson:"_id"`
+	Request   *ParsedRequest     `bson:"request"`
+	Response  *ParsedResponse    `bson:"response"`
+	CreatedAt time.Time          `bson:"createdAt"`
 }
 
 func NewRequestInfo(req *ParsedRequest, resp *ParsedResponse) *RequestInfo {

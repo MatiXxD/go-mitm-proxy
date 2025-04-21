@@ -41,7 +41,7 @@ func (ru *RequestUsecase) AddRequest(req *http.Request, resp *http.Response) err
 	return nil
 }
 
-func (ru *RequestUsecase) GetRequestsInfo() ([]*models.RequestInfo, error) {
+func (ru *RequestUsecase) GetRequestsInfo() ([]*models.RequestInfoWithID, error) {
 	reqs, err := ru.repo.GetRequests()
 	if err != nil {
 		ru.logger.Error("failed to get requests", zap.Error(err))

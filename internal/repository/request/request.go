@@ -31,7 +31,7 @@ func (rr *RequestRepository) AddRequest(parsedReq *models.ParsedRequest, parsedR
 	return nil
 }
 
-func (rr *RequestRepository) GetRequests() ([]*models.RequestInfo, error) {
+func (rr *RequestRepository) GetRequests() ([]*models.RequestInfoWithID, error) {
 	cursor, err := rr.db.Collection("request").Find(context.Background(), bson.D{})
 	if err != nil {
 		rr.logger.Error("Failed to get requests", zap.Error(err))
@@ -39,9 +39,9 @@ func (rr *RequestRepository) GetRequests() ([]*models.RequestInfo, error) {
 	}
 	defer cursor.Close(context.Background())
 
-	var requests []*models.RequestInfo
+	var requests []*models.RequestInfoWithID
 	for cursor.Next(context.Background()) {
-		req := models.RequestInfo{}
+		req := models.RequestInfoWithID{}
 		if err := cursor.Decode(&req); err != nil {
 			rr.logger.Error("Failed to get requests", zap.Error(err))
 			return nil, err
