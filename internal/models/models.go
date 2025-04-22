@@ -55,6 +55,51 @@ func NewParsedRequest(r *http.Request) (*ParsedRequest, error) {
 	}, nil
 }
 
+func CloneParsedRequest(original *ParsedRequest) *ParsedRequest {
+	if original == nil {
+		return nil
+	}
+
+	cloneValues := func(values url.Values) url.Values {
+		copy := make(url.Values)
+		for k, v := range values {
+			copy[k] = append([]string(nil), v...)
+		}
+		return copy
+	}
+
+	cloneHeaders := func(h http.Header) http.Header {
+		copy := make(http.Header)
+		for k, v := range h {
+			copy[k] = append([]string(nil), v...)
+		}
+		return copy
+	}
+
+	cloneCookies := func(cookies []*http.Cookie) []*http.Cookie {
+		copy := make([]*http.Cookie, len(cookies))
+		for i, c := range cookies {
+			if c != nil {
+				cCopy := *c
+				copy[i] = &cCopy
+			}
+		}
+		return copy
+	}
+
+	return &ParsedRequest{
+		Method:        original.Method,
+		URL:           original.URL,
+		Host:          original.Host,
+		Form:          cloneValues(original.Form),
+		Header:        cloneHeaders(original.Header),
+		Cookies:       cloneCookies(original.Cookies),
+		Body:          original.Body,
+		ContentLength: original.ContentLength,
+		PostForm:      cloneValues(original.PostForm),
+	}
+}
+
 type ParsedResponse struct {
 	Status        string         `bson:"status"`
 	StatusCode    int            `bson:"statusCode"`

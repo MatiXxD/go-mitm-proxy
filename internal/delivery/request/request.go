@@ -2,6 +2,7 @@ package request
 
 import (
 	"github.com/MatiXxD/go-mitm-proxy/internal/usecase/request"
+	"github.com/MatiXxD/go-mitm-proxy/pkg/scanner"
 	"github.com/labstack/echo/v4"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.uber.org/zap"
@@ -81,5 +82,30 @@ func (rd *RequestDelivery) RepeatRequest() echo.HandlerFunc {
 		}
 
 		return c.NoContent(http.StatusOK)
+	}
+}
+
+func (rd *RequestDelivery) ScanRequest() echo.HandlerFunc {
+	return func(c echo.Context) error {
+		id := c.Param("id")
+		_, err := primitive.ObjectIDFromHex(id)
+		if err != nil {
+			return c.JSON(http.StatusBadRequest, map[string]string{
+				"error": "wrong id",
+			})
+		}
+
+		reqInfo, err := rd.usecase.GetRequestById(id)
+		if err != nil {
+			rd.logger.Error("RepeatRequest: ", zap.Error(err))
+			return c.JSON(http.StatusNotFound, map[string]string{
+				"error": "request not found",
+			})
+		}
+
+		scanner := scanner.NewInjectionScanner(nil, nil)
+		report := scanner.Scan(reqInfo.Request)
+
+		return c.JSON(http.StatusOK, report)
 	}
 }
