@@ -3,6 +3,7 @@ package request
 import (
 	"github.com/MatiXxD/go-mitm-proxy/internal/usecase/request"
 	"github.com/labstack/echo/v4"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.uber.org/zap"
 	"net/http"
 )
@@ -35,20 +36,50 @@ func (rd *RequestDelivery) GetRequestsInfo() echo.HandlerFunc {
 func (rd *RequestDelivery) GetRequestById() echo.HandlerFunc {
 	return func(c echo.Context) error {
 		id := c.Param("id")
-		if id == "" {
+		_, err := primitive.ObjectIDFromHex(id)
+		if err != nil {
 			return c.JSON(http.StatusBadRequest, map[string]string{
-				"error": "id is required",
+				"error": "wrong id",
 			})
 		}
 
 		reqInfo, err := rd.usecase.GetRequestById(id)
 		if err != nil {
 			rd.logger.Error("GetRequestById: ", zap.Error(err))
-			return c.JSON(http.StatusBadRequest, map[string]string{
+			return c.JSON(http.StatusNotFound, map[string]string{
 				"error": "request not found",
 			})
 		}
 
 		return c.JSON(http.StatusOK, reqInfo)
+	}
+}
+
+func (rd *RequestDelivery) RepeatRequest() echo.HandlerFunc {
+	return func(c echo.Context) error {
+		id := c.Param("id")
+		_, err := primitive.ObjectIDFromHex(id)
+		if err != nil {
+			return c.JSON(http.StatusBadRequest, map[string]string{
+				"error": "wrong id",
+			})
+		}
+
+		reqInfo, err := rd.usecase.GetRequestById(id)
+		if err != nil {
+			rd.logger.Error("RepeatRequest: ", zap.Error(err))
+			return c.JSON(http.StatusNotFound, map[string]string{
+				"error": "request not found",
+			})
+		}
+
+		if err := rd.sendRequest(reqInfo); err != nil {
+			rd.logger.Error("RepeatRequest: ", zap.Error(err))
+			return c.JSON(http.StatusNotFound, map[string]string{
+				"error": "can't send request",
+			})
+		}
+
+		return c.NoContent(http.StatusOK)
 	}
 }

@@ -12,6 +12,7 @@ import (
 type ParsedRequest struct {
 	Method        string         `bson:"method"`
 	URL           string         `bson:"url"`
+	Host          string         `bson:"host"`
 	Form          url.Values     `bson:"queryParams"`
 	Header        http.Header    `bson:"headers"`
 	Cookies       []*http.Cookie `bson:"cookies"`
@@ -44,6 +45,7 @@ func NewParsedRequest(r *http.Request) (*ParsedRequest, error) {
 	return &ParsedRequest{
 		Method:        r.Method,
 		URL:           url,
+		Host:          r.Host,
 		Form:          r.Form,
 		Header:        r.Header,
 		Cookies:       r.Cookies(),
@@ -89,17 +91,17 @@ type RequestInfo struct {
 	CreatedAt time.Time       `bson:"createdAt"`
 }
 
-type RequestInfoWithID struct {
-	ID        primitive.ObjectID `bson:"_id"`
-	Request   *ParsedRequest     `bson:"request"`
-	Response  *ParsedResponse    `bson:"response"`
-	CreatedAt time.Time          `bson:"createdAt"`
-}
-
 func NewRequestInfo(req *ParsedRequest, resp *ParsedResponse) *RequestInfo {
 	return &RequestInfo{
 		Request:   req,
 		Response:  resp,
 		CreatedAt: time.Now(),
 	}
+}
+
+type RequestInfoWithID struct {
+	ID        primitive.ObjectID `bson:"_id"`
+	Request   *ParsedRequest     `bson:"request"`
+	Response  *ParsedResponse    `bson:"response"`
+	CreatedAt time.Time          `bson:"createdAt"`
 }
